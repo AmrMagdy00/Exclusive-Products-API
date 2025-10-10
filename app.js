@@ -8,6 +8,8 @@ dotenv.config();
 // Start The Server
 const app = express();
 
+// Allow for every server to access the api [Temporary]
+app.use(cors());
 // Connect To Database
 await connectDB();
 
