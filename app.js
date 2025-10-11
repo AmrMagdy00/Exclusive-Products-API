@@ -3,6 +3,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import productsRouter from "./routes/productsRouter.js";
 import cors from "cors";
+import logger from "./middleware/logger/logger.js";
 
 // Read Config from .env
 dotenv.config();
@@ -12,15 +13,28 @@ const app = express();
 
 // Allow for every server to access the api [Temporary]
 app.use(cors());
+
 // Connect To Database
 await connectDB();
 
 // Add Middleware To Get All Requests in Json Format
 app.use(express.json());
 
-// Add Middleware For Any Request [For Debugging]
+// Add Middleware To Log  Requests in txt File
+app.use((err, req, res, next) => {
+  logger.error(`Error: ${err.message}`);
+  res.status(500).send("Something went wrong!");
+});
+
 app.use((req, res, next) => {
-  console.log(`[Server] ${req.method} ${req.originalUrl}`);
+  logger.info(`[REQUEST STARTED] ${req.method} ${req.originalUrl}`);
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    logger.info(
+      `[REQUEST ENDED]${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`
+    );
+  });
   next();
 });
 
@@ -37,5 +51,5 @@ if (!PORT) {
 
 // Let The Server Listen To our configured Port
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server started on port ${PORT}`);
 });
