@@ -9,6 +9,7 @@ export function buildQueryOptions(query) {
   if (q.category) filter.category = q.category;
   if (q.subcategory) filter.subCategory = q.subcategory;
   if (q.brand) filter.brand = q.brand;
+  if (q.ishook) filter.isHook = q.ishook;
 
   const page = parseInt(q.page) || 1;
   const pageSize = parseInt(q.pagesize) || 5;

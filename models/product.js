@@ -12,6 +12,7 @@ const colorSchema = new mongoose.Schema(
 const productSchema = new mongoose.Schema(
   {
     id: { type: Number, required: true, unique: true },
+    isHook: { type: Boolean },
     title: { type: String, required: true },
     price: { type: Number, required: true },
     discountPrice: { type: Number },
