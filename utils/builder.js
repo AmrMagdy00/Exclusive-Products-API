@@ -2,22 +2,21 @@ export function buildQueryOptions(query) {
   const filter = {};
   const options = {};
 
-  // Filtering
-  if (query.category) filter.category = query.category;
-  if (query.subCategory) filter.subCategory = query.subCategory;
-  if (query.brand) filter.brand = query.brand;
+  const q = Object.fromEntries(
+    Object.entries(query).map(([key, value]) => [key.toLowerCase(), value])
+  );
 
-  // Pagination
-  const page = parseInt(query.page) || 1;
-  const pageSize = parseInt(query.pageSize) || 5;
+  if (q.category) filter.category = q.category;
+  if (q.subcategory) filter.subCategory = q.subcategory;
+  if (q.brand) filter.brand = q.brand;
 
-  // Validation
+  const page = parseInt(q.page) || 1;
+  const pageSize = parseInt(q.pagesize) || 5;
+
   options.page = page < 1 ? 1 : page;
   options.pageSize = pageSize > 100 ? 100 : pageSize;
 
-  // Sorting
-  options.sort = query.sort || "createdAt";
-  options.order = query.order === "asc" ? "asc" : "desc";
-
+  options.sort = q.sort || "createdAt";
+  options.order = q.order === "asc" ? "asc" : "desc";
   return { filter, options };
 }
