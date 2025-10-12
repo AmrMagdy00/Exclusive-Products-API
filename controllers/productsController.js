@@ -1,20 +1,12 @@
-import logger from "../middleware/logger/logger.js";
-import ProductRepository from "../Repositories/productRepository.js";
-import { buildQueryOptions } from "../utils/builder.js";
+import productsService from "../services/productsService.js";
 
-const getAllProducts = async function (req, res, next) {
+const getAllProducts = async (req, res, next) => {
   try {
-    const { filter, options } = buildQueryOptions(req.query);
-    console.log(options, "hh");
-
-    const products = await ProductRepository.getAll(filter, options);
+    const products = await productsService.getAllProducts(req.query);
     res.status(200).json(products);
-    logger.info(`Succesfull request for Query: ${JSON.stringify(req.query)}`);
   } catch (err) {
     next(err);
   }
 };
 
-export default {
-  getAllProducts,
-};
+export default { getAllProducts };
