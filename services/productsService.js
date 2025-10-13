@@ -8,9 +8,7 @@ class ProductService {
 
     const products = await ProductRepository.findWithPagination(
       filter,
-      options.sort,
-      options.skip,
-      options.limit
+      options
     );
 
     logger.info(`[${products.length}] products fetched successfully`);

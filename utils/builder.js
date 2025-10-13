@@ -7,7 +7,8 @@ export function buildQueryOptions(query) {
   if (q.category) filter.category = q.category;
   if (q.subcategory) filter.subCategory = q.subcategory;
   if (q.brand) filter.brand = q.brand;
-  if (q.ishook) filter.isHook = q.ishook;
+  if (q.ishook) filter.isHook = q.ishook === "true";
+  if (q.isflash) filter.isFlash = q.isflash === "true";
 
   const page = Math.max(parseInt(q.page) || 1, 1);
   const pageSize = Math.min(parseInt(q.pagesize) || 10, 100);
@@ -17,8 +18,13 @@ export function buildQueryOptions(query) {
   const options = {
     skip: (page - 1) * pageSize,
     limit: pageSize,
-    sort: { [sortField]: sortOrder, _id: 1 },
   };
+
+  if (sortField === "random") {
+    options.random = true;
+  } else {
+    options.sort = { [sortField]: sortOrder, _id: 1 };
+  }
 
   return { filter, options };
 }
