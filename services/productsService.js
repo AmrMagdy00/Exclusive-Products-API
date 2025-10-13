@@ -1,4 +1,4 @@
-import ProductRepository from "../repositories/productRepository.js";
+import ProductRepository from "../Repositories/productRepository.js";
 import { buildQueryOptions } from "../utils/builder.js";
 import logger from "../middleware/logger/logger.js";
 
