@@ -16,7 +16,7 @@ const transport = new winston.transports.DailyRotateFile({
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "10m",
-  maxFiles: "14d", // يحتفظ بآخر 14 يوم فقط
+  maxFiles: "14d",
 });
 
 const logger = winston.createLogger({

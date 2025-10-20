@@ -1,20 +1,14 @@
 // app.js
 import express from "express";
 import cors from "cors";
-import productsRouter from "./routes/productsRouter.js";
+import createProductsRouter from "./routes/productRouter.js";
 import logger from "./middleware/logger/logger.js";
 
-export function createApp() {
+export function createApp(productsController) {
   const app = express();
 
   app.use(cors());
   app.use(express.json());
-
-  // Error handler
-  app.use((err, req, res, next) => {
-    logger.error(`Error: ${err.message}`);
-    res.status(500).send("Something went wrong!");
-  });
 
   // Request logger
   app.use((req, res, next) => {
@@ -29,7 +23,15 @@ export function createApp() {
     next();
   });
 
+  // Register routes with injected controller
+  const productsRouter = createProductsRouter(productsController);
   app.use("/products", productsRouter);
+
+  // Error handler (should come after routes)
+  app.use((err, req, res, next) => {
+    logger.error(`Error: ${err.message}`);
+    res.status(500).send("Something went wrong!");
+  });
 
   return app;
 }

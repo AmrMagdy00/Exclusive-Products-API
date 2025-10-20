@@ -1,6 +1,6 @@
 import Product from "../models/product.js";
 
-class ProductRepository {
+export default class ProductRepository {
   async findWithPagination(filter, options) {
     if (options.random) {
       return Product.aggregate([
@@ -14,6 +14,13 @@ class ProductRepository {
       .skip(options.skip)
       .limit(options.limit);
   }
-}
 
-export default new ProductRepository();
+  async findWithID(id) {
+    if (!id) return null;
+
+    const numericId = Number(id);
+    if (Number.isNaN(numericId)) return null;
+
+    return Product.findOne({ id: numericId });
+  }
+}
