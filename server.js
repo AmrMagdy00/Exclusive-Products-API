@@ -4,7 +4,7 @@ dotenv.config(); // Load environment variables first
 import createApp from "./app.js";
 import connectDB from "./config/db.js";
 import logger from "./middleware/logger/logger.js";
-import ProductRepository from "./repositories/productRepository.js";
+import ProductRepository from "./Repositories/productRepository.js";
 import ProductService from "./services/productService.js";
 import createProductsRouter from "./routes/productRouter.js";
 import ProductController from "./controllers/productController.js";
