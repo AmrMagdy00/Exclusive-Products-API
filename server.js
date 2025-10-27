@@ -1,35 +1,116 @@
-import dotenv from "dotenv";
-dotenv.config(); // Load environment variables first
+/**
+ * @file server.js
+ * @description
+ * Entry point for the API server.
+ *
+ * This file performs the following tasks:
+ * 1. Loads environment variables from `.env` file.
+ * 2. Connects to MongoDB.
+ * 3. Initializes repositories, services, and controllers.
+ * 4. Creates the Express app.
+ * 5. Registers product and user routes.
 
+ * 5. Starts the server on the configured port.
+ *
+ * @dependencies
+ * - dotenv: Loads environment variables.
+ * - createApp: Function that sets up Express middlewares.
+ * - connectDB: Function that connects to MongoDB.
+ * - Logger: Custom logger for server events.
+ * - Repositories: Handles DB operations.
+ * - Services: Contains business logic.
+ * - Controllers: Handles HTTP requests.
+ *
+ * @environment
+ * - PORT: The port number the server listens on (default: 4000).
+ * - MONGO_URI: MongoDB connection string.
+ *
+ * @example
+ * To start the server:
+ *   node server.js
+ *
+ * All routes are mounted as:
+ *   /products → Product routes
+ *   /users → User routes
+ * 
+ */
+
+// Load environment variables from .env file
+import dotenv from "dotenv";
+dotenv.config();
+
+// Import the function that creates the Express app
 import createApp from "./app.js";
+
+// Import the function to connect to MongoDB
 import connectDB from "./config/db.js";
+
+// Import custom logger for logging server events
 import logger from "./middleware/logger/logger.js";
+
+// Import repositories, services, and controllers for products
 import ProductRepository from "./Repositories/productRepository.js";
 import ProductService from "./services/productService.js";
-import createProductsRouter from "./routes/productRouter.js";
 import ProductController from "./controllers/productController.js";
 
-// Dependency Injection
-const productRepository = new ProductRepository();
-const productService = new ProductService(productRepository);
-const productController = new ProductController(productService);
+// Import repositories, services, and controllers for users
+import UserRepository from "./Repositories/userRepository.js";
+import UserService from "./services/userService.js";
+import UserController from "./controllers/userController.js";
+import createProductRouter from "./routes/productRouter.js";
+import createUserRouter from "./routes/userRouter.js";
 
-// Create Express app
-const app = createApp(productController);
+// -------------------- Dependency Injection --------------------
+// Create instances of repositories, services, and controllers
+const productRepository = new ProductRepository(); // Handles DB operations for products
+const productService = new ProductService(productRepository); // Contains business logic for products
+const productController = new ProductController(productService); // Handles HTTP requests for products
 
-// Connect to the database
+const userRepository = new UserRepository(); // Handles DB operations for users
+const userService = new UserService(userRepository); // Contains business logic for users
+const userController = new UserController(userService); // Handles HTTP requests for users
+
+// -------------------- Create Express App --------------------
+// Initialize Express app
+const app = createApp();
+
+// -------------------- Connect to Database --------------------
+// Connect to MongoDB using the connection function
 await connectDB();
 
-// Register routes
-const productRouter = createProductsRouter(productController);
-app.use("/api/products", productRouter);
+// -------------------- Register Routes --------------------
+// Mount product routes at /products
+app.use("/products", createProductRouter(productController));
 
+// Mount user routes at /users
+app.use("/users", createUserRouter(userController));
+
+// -------------------- Error Handler --------------------
+// This middleware catches any errors thrown in routes or other middlewares
+// It should be registered after all routes
+app.use((err, req, res, next) => {
+  logger.error(`[ERROR] ${err.message}`);
+
+  if (err.isOperational) {
+    // Errors
+    res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      errorCode: err.errorCode || null,
+      details: err.details || null,
+    });
+  } else {
+    // Errors Not Expected → 500
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong! Please check logs.",
+      errorCode: "INTERNAL_SERVER_ERROR",
+    });
+  }
+});
+
+// -------------------- Start Server --------------------
 const PORT = process.env.PORT || 4000;
-if (!PORT) {
-  console.error("Error: PORT is not defined in environment variables.");
-  process.exit(1);
-}
-
 app.listen(PORT, () => {
-  logger.info(`Server started on port ${PORT}`);
+  logger.info(`Server started on port ${PORT}`); // Log when server is running
 });
