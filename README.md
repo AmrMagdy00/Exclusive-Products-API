@@ -120,10 +120,6 @@ Before you begin, ensure you have the following installed:
    MONGO_URI=mongodb://localhost:27017/exclusive-db
    ```
 
-   For MongoDB Atlas:
-   ```env
-   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/exclusive-db?retryWrites=true&w=majority
-   ```
 
 2. **Customize environment variables** as needed for your setup.
 
